@@ -77,6 +77,42 @@ def getLCKTeamLinkList(split_link_list):
                 team_link_list.append((str(link2.get('href')).strip('.').replace(old, new), year, split))
     return team_link_list
 
+def getLPLTeamLinkList(split_link_list):
+    team_link_list = []
+
+    for (link, year, split) in split_link_list:
+        html_page = firefoxPage(link)
+        soup = BeautifulSoup(html_page, features="lxml")
+        for link2 in soup.find_all('a'):
+            if str(link2.get('href')).startswith("./team-stats/"):
+                old, new = LPL_link_suffix(split, year)
+                team_link_list.append((str(link2.get('href')).strip('.').replace(old, new), year, split))
+    return team_link_list
+
+def getLECTeamLinkList(split_link_list):
+    team_link_list = []
+
+    for (link, year, split) in split_link_list:
+        html_page = firefoxPage(link)
+        soup = BeautifulSoup(html_page, features="lxml")
+        for link2 in soup.find_all('a'):
+            if str(link2.get('href')).startswith("./team-stats/"):
+                old, new = LEC_link_suffix(split, year)
+                team_link_list.append((str(link2.get('href')).strip('.').replace(old, new), year, split))
+    return team_link_list
+
+def getLCSTeamLinkList(split_link_list):
+    team_link_list = []
+
+    for (link, year, split) in split_link_list:
+        html_page = firefoxPage(link)
+        soup = BeautifulSoup(html_page, features="lxml")
+        for link2 in soup.find_all('a'):
+            if str(link2.get('href')).startswith("./team-stats/"):
+                old, new = LCS_link_suffix(split, year)
+                team_link_list.append((str(link2.get('href')).strip('.').replace(old, new), year, split))
+    return team_link_list
+
 # Returns the table element of the player's stats (team name is asked to find the right table in the page)
 def get_player_table(soup, team_name):
     tables = soup.find_all('table')
@@ -113,7 +149,7 @@ def getPlayerRole(team_link_list):
                 data.append(stat)
     return pd.DataFrame(data, columns=labels)
 
-def getLCKTeamStats(split_link_list):
+def getTeamStats(split_link_list):
     data = []
     labels = None
     for (link, year, split) in split_link_list:
@@ -137,3 +173,15 @@ def getLCKTeamStats(split_link_list):
 # Auxillary function to get the suffix of the link of a given split and year of the LCK (Korean League)
 def LCK_link_suffix(split, year):
     return ('LCK ' + split + ' ' + str(year) + '/','LCK%20' + split + '%20' + str(year) + '/')
+
+# Auxillary function to get the suffix of the link of a given split and year of the LPL (Chinese League)
+def LPL_link_suffix(split, year):
+    return ('LPL ' + split + ' ' + str(year) + '/','LPL%20' + split + '%20' + str(year) + '/')
+
+# Auxillary function to get the suffix of the link of a given split and year of the LEC (European League)
+def LEC_link_suffix(split, year):
+    return ('LEC ' + split + ' ' + str(year) + '/','LEC%20' + split + '%20' + str(year) + '/')
+
+# Auxillary function to get the suffix of the link of a given split and year of the LCS (North American League)
+def LCS_link_suffix(split, year):
+    return ('LCS ' + split + ' ' + str(year) + '/','LCS%20' + split + '%20' + str(year) + '/')

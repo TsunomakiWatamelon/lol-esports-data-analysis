@@ -97,4 +97,13 @@ def pca_3_components(data):
 
     plt.show()
 
+def inter_class_variance(df, target):
+    inter_class_var = []
+
+    for col in df.columns:
+        inter_class_var.append(df.groupby(target)[col].mean().var())
+
+    return inter_class_var
+
+
 

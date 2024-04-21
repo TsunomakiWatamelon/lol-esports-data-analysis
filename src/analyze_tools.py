@@ -2,7 +2,9 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import warnings
+
 
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
@@ -33,23 +35,26 @@ def raw_violinplot(data, nrows, ncols, figsize=(20, 15)):
 
     i = 0
     j = 0
+    count = 0
     for cols in data.columns:
         if j != 0 and j % ncols == 0:
             i += 1
             j = 0
-        sns.violinplot(y=data.iloc[:, i], ax=axes[i, j])
+        sns.violinplot(y=data.iloc[:, count], ax=axes[i, j])
         axes[i, j].set_title(cols)
+        axes[i, j].set_ylabel('')  # Clear the default y-label
         j += 1
+        count += 1
 
     plt.show()
 
 
-def corr_heatmap(data):
+def corr_heatmap(data, cmap='coolwarm'):
     scaler = preprocessing.StandardScaler()
     norm_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
 
     corr = norm_data.corr()
-    sns.heatmap(corr)
+    sns.heatmap(corr, cmap=cmap)
 
 
 def pca_analyze(data):
@@ -75,8 +80,8 @@ def pca_analyze(data):
     plt.show()
 
 
-def pca_3_components(data):
-    pca3 = PCA(n_components=3)
+def pca_components(data, n_components=3):
+    pca3 = PCA(n_components=n_components)
     scaler = preprocessing.StandardScaler()
     norm_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
     pca_array = pca3.fit_transform(norm_data)
@@ -89,11 +94,26 @@ def pca_3_components(data):
 
     df_pca = pd.DataFrame(pca_data)
 
-    plt.subplots(figsize=(20, 20))
+    plt.subplots(figsize=(15, 15))
     sns.scatterplot(data=df_pca, x=indexs[0], y=indexs[0 + 1 % 3])
     for i in range(pca3.components_.shape[1]):
         plt.arrow(0, 0, pca3.components_[0, i] * 10, pca3.components_[0 + 1 % 3, i] * 10, alpha=0.5, color='black')
         plt.text(pca3.components_[0, i] * 10, pca3.components_[0 + 1 % 3, i] * 10, norm_data.columns[i])
+
+    plt.show()
+
+def pca_components3d(data):
+    pca = PCA(n_components=3)
+    scaler = preprocessing.StandardScaler()
+    norm_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
+    pca_array = pca.fit_transform(norm_data)
+
+    fig = plt.figure(figsize=(15, 15))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(pca_array[:, 0], pca_array[:, 1], pca_array[:, 2])
+
+    for i in range(pca.components_.shape[1]):
+        ax.text(pca.components_[0, i], pca.components_[1, i], pca.components_[2, i], norm_data.columns[i])
 
     plt.show()
 

@@ -80,7 +80,7 @@ def pca_analyze(data):
     plt.show()
 
 
-def pca_components(data, n_components=3):
+def pca_components(data, n_components=3, dimension=0):
     pca3 = PCA(n_components=n_components)
     scaler = preprocessing.StandardScaler()
     norm_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
@@ -95,10 +95,10 @@ def pca_components(data, n_components=3):
     df_pca = pd.DataFrame(pca_data)
 
     plt.subplots(figsize=(15, 15))
-    sns.scatterplot(data=df_pca, x=indexs[0], y=indexs[0 + 1 % 3])
+    sns.scatterplot(data=df_pca, x=indexs[dimension], y=indexs[(dimension + 1) % n_components])
     for i in range(pca3.components_.shape[1]):
-        plt.arrow(0, 0, pca3.components_[0, i] * 10, pca3.components_[0 + 1 % 3, i] * 10, alpha=0.5, color='black')
-        plt.text(pca3.components_[0, i] * 10, pca3.components_[0 + 1 % 3, i] * 10, norm_data.columns[i])
+        plt.arrow(0, 0, pca3.components_[dimension, i] * 10, pca3.components_[(dimension + 1) % n_components, i] * 10, alpha=0.5, color='black')
+        plt.text(pca3.components_[dimension, i] * 10, pca3.components_[(dimension + 1) % n_components, i] * 10, norm_data.columns[i])
 
     plt.show()
 

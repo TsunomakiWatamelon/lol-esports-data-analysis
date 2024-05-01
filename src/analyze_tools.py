@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import warnings
+import plotly.graph_objects as go
 
 
 from sklearn import preprocessing
@@ -125,5 +126,50 @@ def inter_class_variance(df, target):
 
     return inter_class_var
 
+def show_pca_correlation_circle(pca_result, df, component_1 = 0, component_2 = 1):
+    assert component_1 > 0 and component_1 <= pca_result.components_.shape[0], "Invalid component_1"
+    assert component_2 > 0 and component_2 <= pca_result.components_.shape[0], "Invalid component_2"
 
+    circle = go.Scatter(x=[0], y=[0], mode="markers", marker=dict(size=0), showlegend=False)
+    arrows = []
+    annotations = []
+    for i, (pc1, pc2) in enumerate(zip(pca_result.components_[component_1 - 1], pca_result.components_[component_2 - 1])):
+        arrows.append(go.Scatter(
+            x=[0, pc1],
+            y=[0, pc2],
+            mode="lines+markers",
+            line=dict(color="red", width=2),
+            showlegend=False
+        ))
+        annotations.append(go.Scatter(
+            x=[pc1],
+            y=[pc2],
+            text=df.columns[i],
+            mode="text",
+            textposition="middle center",
+            textfont=dict(color="blue"),
+            showlegend=False
+        ))
 
+    layout = go.Layout(
+        title=f'Correlation circle for PC{component_1} and PC{component_2}',
+        xaxis=dict(title='PC' + str(component_1)),
+        yaxis=dict(title='PC' + str(component_2)),
+        width=700,
+        height=700,
+        shapes=[
+            dict(
+                type="circle",
+                xref="x",
+                yref="y",
+                x0=-1,
+                y0=-1,
+                x1=1,
+                y1=1,
+                line=dict(color="black"),
+            )
+        ]
+    )
+
+    fig = go.Figure(data=[circle, *arrows, *annotations], layout=layout)
+    fig.show()
